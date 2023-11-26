@@ -1,6 +1,8 @@
 body {
   font-family: 'Montserrat', sans-serif;
   background-image: url(/src/images/green-grass-nature-field-closeup-backlit-by-golden-sunlight-with-sun-rays-natural-spring-grass-on-blurred-bokeh-background-min.jpg);
+  /* 
+  background-image: url(/src/images/white-fluffy-dandelions-ai-generated-image.jpg);*/
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
