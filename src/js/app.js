@@ -18,20 +18,16 @@ const onInfiniteLoad = async (entries, observer) => {
   if (!entries[0].isIntersecting) {
     return;
   }
-  pixabayAPI.page += 1;
   try {
     const { data } = await pixabayAPI.fetchPhotosByQuery();
     const lastPage = Math.ceil(data.totalHits / pixabayAPI.perPage);
-    galleryListEl.insertAdjacentHTML(
-      'beforeend',
-      createGalleryCardsTemplate(data.hits)
-    );
-    simpleLiteBox.refresh();
 
     if (lastPage === pixabayAPI.page) {
       Notify.info("We're sorry, but you've reached the end of search results.");
       infiniteScrollObserver.unobserve(infiniteScroll);
     }
+    galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
+    simpleLiteBox.refresh();
   } catch (err) {
     console.log(err);
   }
