@@ -6,6 +6,8 @@ import { PixabayAPI } from './pixabay-api';
 
 const pixabayAPI = new PixabayAPI();
 
+pixabayAPI.page = 1;
+
 const options = {
   root: null,
   rootMargin: '0px 0px 100px 0px',
@@ -18,6 +20,7 @@ const onInfiniteLoad = async (entries, observer) => {
   if (!entries[0].isIntersecting) {
     return;
   }
+  pixabayAPI.page += 1;
   try {
     const { data } = await pixabayAPI.fetchPhotosByQuery();
     const lastPage = Math.ceil(data.totalHits / pixabayAPI.perPage);
@@ -26,7 +29,7 @@ const onInfiniteLoad = async (entries, observer) => {
       Notify.info("We're sorry, but you've reached the end of search results.");
       infiniteScrollObserver.unobserve(infiniteScroll);
     }
-    galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
+    galleryListEl.innerHTML += createGalleryCardsTemplate(data.hits);
     simpleLiteBox.refresh();
   } catch (err) {
     console.log(err);
@@ -44,7 +47,7 @@ const onSearchFormElSubmit = async event => {
 
   const searchQuery = event.currentTarget.elements['searchQuery'].value.trim();
   pixabayAPI.query = searchQuery;
-  pixabayAPI.page = 1;
+
   if (!searchQuery) {
     Notify.info('Empty search');
     return;
@@ -52,6 +55,7 @@ const onSearchFormElSubmit = async event => {
 
   try {
     const { data } = await pixabayAPI.fetchPhotosByQuery();
+
     if (data.totalHits === 0) {
       Report.info(
         'Sorry,',
@@ -68,7 +72,7 @@ const onSearchFormElSubmit = async event => {
       galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
       return;
     }
-    galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
+    galleryListEl.innerHTML += createGalleryCardsTemplate(data.hits);
     simpleLiteBox.refresh();
 
     if (data.totalHits > pixabayAPI.perPage) {
