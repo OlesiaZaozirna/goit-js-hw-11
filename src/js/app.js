@@ -82,5 +82,5 @@ const onSearchFormElSubmit = async event => {
     Report.failure('Oops! Something went wrong! Try reloading the page!');
   }
 };
-
+//Останні зміни внесено
 formEl.addEventListener('submit', onSearchFormElSubmit);
