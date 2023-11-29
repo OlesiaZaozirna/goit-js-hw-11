@@ -29,11 +29,18 @@ const onInfiniteLoad = async (entries, observer) => {
       Notify.info("We're sorry, but you've reached the end of search results.");
       infiniteScrollObserver.unobserve(infiniteScroll);
     }
+    //Перевіряємо ,знаходиться користувач у верхній частині сторінки
+    const isAtTop = window.scrollY === 0;
 
-    galleryListEl.insertAdjacentHTML(
-      'beforeend',
-      createGalleryCardsTemplate(data.hits)
-    );
+    //Вставляємо розмітку в залежності від положення користувача
+    if (isAtTop) {
+      galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
+    } else {
+      galleryListEl.insertAdjacentHTML(
+        'beforeend',
+        createGalleryCardsTemplate(data.hits)
+      );
+    }
     simpleLiteBox.refresh();
   } catch (err) {
     console.log(err);
@@ -45,7 +52,7 @@ const infiniteScrollObserver = new IntersectionObserver(
   options
 );
 
-// Функція для пошуку з інпуту
+// Функція для опрацювання форми пошуку
 const onSearchFormElSubmit = async event => {
   event.preventDefault();
 
@@ -55,6 +62,9 @@ const onSearchFormElSubmit = async event => {
   //Очищаємо розмітку галереї та скидаємо сторінку до першої перед новим пошуком
   galleryListEl.innerHTML = '';
   pixabayAPI.page = 1;
+
+  //Прокрутка сторінки вгору з використання плавного скроллу
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (!searchQuery) {
     Notify.info('Empty search');
@@ -81,15 +91,13 @@ const onSearchFormElSubmit = async event => {
       galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
       return;
     }
+    infiniteScrollObserver.disconnect();
 
     // Вставляємо HTML в кінець галереї для кількох знайдених зображень
-    galleryListEl.insertAdjacentHTML(
-      'beforeend',
-      createGalleryCardsTemplate(data.hits)
-    );
+    galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
     simpleLiteBox.refresh();
 
-    // Запускаємо обсервер для скролу, якщо є більше зображень, ніж на одну сторінку
+    // Запускаємо обсервер для скроллу, якщо є більше зображень, ніж на одну сторінку
     if (data.totalHits > pixabayAPI.perPage) {
       infiniteScrollObserver.observe(infiniteScroll);
     }
