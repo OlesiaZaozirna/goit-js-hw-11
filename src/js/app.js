@@ -10,7 +10,7 @@ pixabayAPI.page = 1;
 
 const options = {
   root: null,
-  rootMargin: '0px 0px 100px 0px',
+  rootMargin: '0px 0px 200px 0px',
   threshold: 1.0,
 };
 
@@ -29,7 +29,11 @@ const onInfiniteLoad = async (entries, observer) => {
       Notify.info("We're sorry, but you've reached the end of search results.");
       infiniteScrollObserver.unobserve(infiniteScroll);
     }
-    galleryListEl.innerHTML += createGalleryCardsTemplate(data.hits);
+
+    galleryListEl.insertAdjacentHTML(
+      'beforeend',
+      createGalleryCardsTemplate(data.hits)
+    );
     simpleLiteBox.refresh();
   } catch (err) {
     console.log(err);
@@ -41,12 +45,16 @@ const infiniteScrollObserver = new IntersectionObserver(
   options
 );
 
-// Фун-ція для пошуку з інпуту
+// Функція для пошуку з інпуту
 const onSearchFormElSubmit = async event => {
   event.preventDefault();
 
   const searchQuery = event.currentTarget.elements['searchQuery'].value.trim();
   pixabayAPI.query = searchQuery;
+
+  //Очищаємо розмітку галереї та скидаємо сторінку до першої перед новим пошуком
+  galleryListEl.innerHTML = '';
+  pixabayAPI.page = 1;
 
   if (!searchQuery) {
     Notify.info('Empty search');
@@ -68,13 +76,20 @@ const onSearchFormElSubmit = async event => {
       Notify.success(`we found ${data.totalHits} pictures`);
     }
 
+    // Якщо знайдено лише одне зображення, вставляємо HTML повністю
     if (data.total === 1) {
       galleryListEl.innerHTML = createGalleryCardsTemplate(data.hits);
       return;
     }
-    galleryListEl.innerHTML += createGalleryCardsTemplate(data.hits);
+
+    // Вставляємо HTML в кінець галереї для кількох знайдених зображень
+    galleryListEl.insertAdjacentHTML(
+      'beforeend',
+      createGalleryCardsTemplate(data.hits)
+    );
     simpleLiteBox.refresh();
 
+    // Запускаємо обсервер для скролу, якщо є більше зображень, ніж на одну сторінку
     if (data.totalHits > pixabayAPI.perPage) {
       infiniteScrollObserver.observe(infiniteScroll);
     }
@@ -82,5 +97,5 @@ const onSearchFormElSubmit = async event => {
     Report.failure('Oops! Something went wrong! Try reloading the page!');
   }
 };
-//Останні зміни внесено
+
 formEl.addEventListener('submit', onSearchFormElSubmit);
