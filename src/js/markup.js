@@ -1,4 +1,4 @@
-export const createGalleryCardsTemplate = photos => {
+export const createCards = photos => {
   return photos
     .map(photo => {
       const {

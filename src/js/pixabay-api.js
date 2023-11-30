@@ -1,36 +1,19 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://pixabay.com/api';
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = '40838413-487c32a1982a33454d1384abb';
 
-export class PixabayAPI {
-  #API_KEY = '40838413-487c32a1982a33454d1384abb';
-  #query = '';
-
-  constructor() {
-    this.page = 1;
-    this.#query = null;
-    this.perPage = 40;
-  }
-
-  // Запит картинок по ключовому слову
-  fetchPhotosByQuery() {
-    const axiosOptions = {
-      params: {
-        key: this.#API_KEY,
-        q: this.#query,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-        page: this.page,
-        per_page: this.perPage,
-      },
-    };
-
-    return axios.get(`/?`, axiosOptions);
-  }
-
-  // Сетер для запису searchQuery
-  set query(newQuery) {
-    this.#query = newQuery;
-  }
+export async function getPhotos(userInput, page, per_page) {
+  const param = new URLSearchParams({
+    key: API_KEY,
+    q: userInput,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    page: page,
+    per_page: per_page,
+  });
+  const res = await axios.get(`${BASE_URL}?${param}`);
+  console.log(res.data);
+  return res.data;
 }
